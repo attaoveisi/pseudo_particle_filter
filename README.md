@@ -1,5 +1,5 @@
 # pseudo_particle_filter
-An implementation of MCL
+This is a 2D implementation of MCL for localization of a robot with a known map using particle filters. This is being developed and not finished yet (SW may be unstable at several commits).
 
 ## Bayes filtering
 The powerful Monte Carlo localization algorithm estimates the posterior distribution of a robot’s position and orientation based on sensory information. This process is known as a recursive Bayes filter.
