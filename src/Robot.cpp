@@ -1,13 +1,11 @@
 #include "Robot.h"
 
-Robot::Robot() {}
 Robot::~Robot() {}
 
-Robot::Robot(Map map){
+Robot::Robot(){
     // Constructor
-
-    x = gen_real_random() * map.world_size; // robot's x coordinate
-    y = gen_real_random() * map.world_size; // robot's y coordinate
+    x = gen_real_random() * world_size; // robot's x coordinate
+    y = gen_real_random() * world_size; // robot's y coordinate
     orient = gen_real_random() * 2.0 * M_PI; // robot's orientation
 
     forward_noise = 0.0; //noise of the forward movement
@@ -15,13 +13,13 @@ Robot::Robot(Map map){
     sense_noise = 0.0; //noise of the sensing
 }
 
-void Robot::set(double new_x, double new_y, double new_orient, Map map){
+void Robot::set(double new_x, double new_y, double new_orient){
     // Set robot new position and orientation
-    if (new_x < 0 || new_x >= map.world_size){
+    if (new_x < 0 || new_x >= world_size){
         throw std::invalid_argument("X coordinate out of bound");
     }
 
-    if (new_y < 0 || new_y >= map.world_size){
+    if (new_y < 0 || new_y >= world_size){
         throw std::invalid_argument("Y coordinate out of bound");
     }
 
@@ -41,20 +39,20 @@ void Robot::set_noise(double new_forward_noise, double new_turn_noise, double ne
     sense_noise = new_sense_noise;
 }
 
-vector<double> Robot::sense(Map map){
+std::vector<double> Robot::sense(){
     // Measure the distances from the robot toward the landmarks
-    vector<double> z(map.num_landmarks);
+    std::vector<double> z(num_landmarks);
     double dist;
 
-    for (int i = 0; i < map.num_landmarks; i++) {
-        dist = sqrt(pow((x - map.landmarks[i][0]), 2) + pow((y - map.landmarks[i][1]), 2));
+    for (int i = 0; i < num_landmarks; i++) {
+        dist = sqrt(pow((x - landmarks[i][0]), 2) + pow((y - landmarks[i][1]), 2));
         dist += gen_gauss_random(0.0, sense_noise);
         z[i] = dist;
     }
     return z;
 }
 
-Robot Robot::move(double turn, double forward, Map map){
+Robot Robot::move(double turn, double forward){
     if (forward < 0)
         throw std::invalid_argument("Robot cannot move backward");
 
@@ -68,12 +66,12 @@ Robot Robot::move(double turn, double forward, Map map){
     y = y + (sin(orient) * dist);
 
     // cyclic truncate
-    x = mod(x, map.world_size);
-    y = mod(y, map.world_size);
+    x = mod(x, world_size);
+    y = mod(y, world_size);
 
     // set particle
-    Robot res(map);
-    res.set(x, y, orient, map);
+    Robot res;
+    res.set(x, y, orient);
     res.set_noise(forward_noise, turn_noise, sense_noise);
 
     return res;
@@ -84,9 +82,9 @@ std::string Robot::show_pose() {
     return "[x=" + std::to_string(x) + " y=" + std::to_string(y) + " orient=" + std::to_string(orient) + "]";
 }
 
-std::string Robot::read_sensors(Map map){
+std::string Robot::read_sensors(){
     // Returns all the distances from the robot toward the landmarks
-    vector<double> z = sense(map);
+    std::vector<double> z = sense();
     std::string readings = "[";
     for (int i = 0; i < z.size(); i++) {
         readings += std::to_string(z[i]) + " ";
@@ -96,13 +94,13 @@ std::string Robot::read_sensors(Map map){
     return readings;
 }
 
-double Robot::measurement_prob(vector<double> measurement, Map map){
+double Robot::measurement_prob(std::vector<double> measurement){
     // Calculates how likely a measurement should be
     double prob = 1.0;
     double dist;
 
-    for (int i = 0; i < map.num_landmarks; i++) {
-        dist = sqrt(pow((x - map.landmarks[i][0]), 2) + pow((y - map.landmarks[i][1]), 2));
+    for (int i = 0; i < num_landmarks; i++) {
+        dist = sqrt(pow((x - landmarks[i][0]), 2) + pow((y - landmarks[i][1]), 2));
         prob *= gaussian(dist, sense_noise, measurement[i]);
     }
 
@@ -123,16 +121,32 @@ double Robot::gaussian(double mu, double sigma, double x){
 return exp(-(pow((mu - x), 2)) / (pow(sigma, 2)) / 2.0) / sqrt(2.0 * M_PI * (pow(sigma, 2)));
 }
 
-double Robot::evaluation(Robot r, Robot p[], int n, Map map)
+double Robot::evaluation(Robot r, Robot p[], int n)
 {
     //Calculate the mean error of the system
     double sum = 0.0;
     for (int i = 0; i < n; i++) {
         //the second part is because of world's cyclicity
-        double dx = mod((p[i].x - r.x + (map.world_size / 2.0)), map.world_size) - (map.world_size / 2.0);
-        double dy = mod((p[i].y - r.y + (map.world_size / 2.0)), map.world_size) - (map.world_size / 2.0);
+        double dx = mod((p[i].x - r.x + (world_size / 2.0)), world_size) - (world_size / 2.0);
+        double dy = mod((p[i].y - r.y + (world_size / 2.0)), world_size) - (world_size / 2.0);
         double err = sqrt(pow(dx, 2) + pow(dy, 2));
         sum += err;
     }
     return sum / n;
+}
+
+void Robot::get_world_size(Map &map){
+    this->world_size = map.world_size;
+}
+
+void Robot::get_landmarks(Map &map){
+    this->num_landmarks = map.num_landmarks;
+    for(int i = 0; i < this->num_landmarks; i++){
+        if (i == 0) {
+            std::cout << "The map landmarks are being copied to robot landmarks..." << std::endl;
+        }
+        this->landmarks[i][0] = map.landmarks[i][0];
+        this->landmarks[i][1] = map.landmarks[i][1];
+        std::cout << " Landmark " << i << " = " << map.landmarks[i][0] << "\t" << map.landmarks[i][1] << " is copied!" << std::endl;
+    }
 }
