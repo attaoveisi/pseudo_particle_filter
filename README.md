@@ -37,7 +37,21 @@ we will spread the particles uniformly e.g.,
 ![image](https://user-images.githubusercontent.com/17289954/102711509-8bb24b00-42ba-11eb-9bda-21828b9ab088.png)
 
 
+## The logic of the code
 
+First, as an initialization phase, a set of particles are generated and randomly distributed in the world (map). Then, importance-weight is calculated based on the actual measurement from robot (*z_t*):
+
+![image](https://user-images.githubusercontent.com/17289954/102715635-24ef5a80-42d7-11eb-9dc0-0dc43e36327b.png)
+
+and the corresponding particle (virtual) measurements:
+
+![image](https://user-images.githubusercontent.com/17289954/102715688-70a20400-42d7-11eb-905b-02714a256a88.png)
+
+The mismatch between the two indicates the particle's importance weight. Next, the resampling process takes place, where the normalized weights (*alpha*) decide the survival chance of the particles as
+
+![image](https://user-images.githubusercontent.com/17289954/102715969-fd00f680-42d8-11eb-8807-e8ea4479a035.png)
+
+However, the max operator for the weights are not used and a rather random process should be employed.
 
 
 
