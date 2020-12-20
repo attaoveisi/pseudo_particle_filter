@@ -136,17 +136,16 @@ double Robot::evaluation(Robot r, Robot p[], int n)
 }
 
 void Robot::get_world_size(Map &map){
-    this->world_size = map.world_size;
+    world_size = map.world_size;
 }
 
 void Robot::get_landmarks(Map &map){
-    this->num_landmarks = map.num_landmarks;
+    num_landmarks = map.num_landmarks;
     for(int i = 0; i < this->num_landmarks; i++){
         if (i == 0) {
             std::cout << "The map landmarks are being copied to robot landmarks..." << std::endl;
         }
-        this->landmarks[i][0] = map.landmarks[i][0];
-        this->landmarks[i][1] = map.landmarks[i][1];
+        landmarks.push_back({map.landmarks[i][0], map.landmarks[i][1]});
         std::cout << " Landmark " << i << " = " << map.landmarks[i][0] << "\t" << map.landmarks[i][1] << " is copied!" << std::endl;
     }
 }

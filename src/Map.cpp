@@ -1,14 +1,13 @@
 #include "Map.h"
 
 void Map::get_world_size(const double val) {
-    this->world_size = val;
+    world_size = val;
 }
 
-void Map::get_landmarks(const std::vector<std::vector<double>> landmarks, int val){
-    this->num_landmarks = val;
+void Map::get_landmarks(const std::vector<std::vector<double>> &array, const int val){
+    num_landmarks = val;
     for(int i = 0; i < val; i++){
-        this->landmarks[i][0] = landmarks[i][0];
-        this->landmarks[i][1] = landmarks[i][1];
+        landmarks.push_back({array[i][0], array[i][1]});
     }
 }
 

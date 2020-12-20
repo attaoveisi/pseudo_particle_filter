@@ -40,38 +40,43 @@ void visualization(int n, Robot robot, int step, Robot p[], Robot pr[])
 
 int main()
 {
+    Base base;
     // Landmarks
     Map map;
     // Map size in meters
     int map_size = 100;
     map.get_world_size(map_size);
     int num_landmarks = 8;
-    std::vector<std::vector<double>> landmarks = { { 20.0, 20.0 },
-                                                   { 20.0, 80.0 },
-                                                   { 20.0, 50.0 },
-                                                   { 50.0, 20.0 },
-                                                   { 50.0, 80.0 },
-                                                   { 80.0, 80.0 },
-                                                   { 80.0, 20.0 },
-                                                   { 80.0, 50.0 } };
+    std::vector<std::vector<double>> landmarks { { 20.0, 20.0 },
+                                                 { 20.0, 80.0 },
+                                                 { 20.0, 50.0 },
+                                                 { 50.0, 20.0 },
+                                                 { 50.0, 80.0 },
+                                                 { 80.0, 80.0 },
+                                                 { 80.0, 20.0 },
+                                                 { 80.0, 50.0 } };
+    for (int i = 0; i < num_landmarks; i++){
+        std::cout << landmarks[i][0] << "\t" << landmarks[i][1] << std::endl;
+    }
 
     map.get_landmarks(landmarks, num_landmarks);
+
     map.print_map();
-    /*
-    //Practice Interfacing with Robot Class
-    Robot myrobot;
+
+    //Initialize myrobot object and Initialize a measurment vector
+    Robot myrobot = Robot();
     myrobot.get_world_size(map);
     myrobot.get_landmarks(map);
+
     myrobot.print_robot();
-
-
     myrobot.set_noise(5.0, 0.1, 5.0);
     myrobot.set(30.0, 50.0, M_PI / 2.0);
-    myrobot.move(-M_PI / 2.0, 15.0);
-    //cout << myrobot.read_sensors() << endl;
-    myrobot.move(-M_PI / 2.0, 10.0);
-    //cout << myrobot.read_sensors() << endl;
 
+    // Measurement vector
+    std::vector<double> z;
+
+    //Iterating 50 times over the set of particles
+    int steps = 50;
     // Create a set of particles
     int n = 1000;
     Robot p[n];
@@ -81,16 +86,6 @@ int main()
         //cout << p[i].show_pose() << endl;
     }
 
-    //Re-initialize myrobot object and Initialize a measurment vector
-    myrobot = Robot();
-    myrobot.set_noise(5.0, 0.1, 5.0);
-    myrobot.set(30.0, 50.0, M_PI / 2.0);
-
-    // Measurement vector
-    vector<double> z;
-
-    //Iterating 50 times over the set of particles
-    int steps = 50;
     for (int t = 0; t < steps; t++) {
 
         //Move the robot and sense the environment afterwards
@@ -113,16 +108,16 @@ int main()
 
         //Resample the particles with a sample probability proportional to the importance weight
         Robot p3[n];
-        int index = p3[0].gen_real_random() * n;
+        int index = base.gen_real_random() * n;
         //cout << index << endl;
         double beta = 0.0;
         double mw = p3[0].max(w, n);
         //cout << mw;
         for (int i = 0; i < n; i++) {
-            beta += p3[i].gen_real_random() * 2.0 * mw;
+            beta += base.gen_real_random() * 2.0 * mw;
             while (beta > w[index]) {
                 beta -= w[index];
-                index = p3[i].mod((index + 1), n);
+                index = base.mod((index + 1), n);
             }
             p3[i] = p[index];
         }
@@ -138,6 +133,6 @@ int main()
         std::cout << "Step = " << t << ", Evaluation = " << p3[0].evaluation(myrobot, p, n) << std::endl;
 
     } //End of Steps loop
-     */
+
     return 0;
 }

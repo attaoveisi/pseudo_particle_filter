@@ -6,7 +6,7 @@
 class Map {
 public:
     void get_world_size(const double val);
-    void get_landmarks(std::vector<std::vector<double>> landmarks, int val);
+    void get_landmarks(const std::vector<std::vector<double>> &array, const int val);
     void print_map();
 
 private:
