@@ -24,6 +24,18 @@ cosidering this shorty intro (refer to [this paper](http://robots.stanford.edu/p
 
 ![image](https://user-images.githubusercontent.com/17289954/102711316-e8ad0180-42b8-11eb-8734-f4953f18c9e3.png)
 
+In his implementation, the robot is inside a cyclic map of size (100,100) , can move forwards, rotate left/right and measure its distance to eight landmarks as shown below:
+
+![image](https://user-images.githubusercontent.com/17289954/102711450-22cad300-42ba-11eb-84d8-4c51829378be.png)
+
+and with range finder sensors
+
+![image](https://user-images.githubusercontent.com/17289954/102711470-4857dc80-42ba-11eb-9a75-2cebd4ff9b72.png)
+
+we will spread the particles uniformly e.g.,
+
+![image](https://user-images.githubusercontent.com/17289954/102711509-8bb24b00-42ba-11eb-9bda-21828b9ab088.png)
+
 
 
 
