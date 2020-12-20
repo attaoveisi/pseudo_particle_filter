@@ -22,7 +22,8 @@ with *X_t* and *Z_{1,..,t}* being the state at time step *t* and observation upt
 
 cosidering this shorty intro (refer to [this paper](http://robots.stanford.edu/papers/thrun.robust-mcl.pdf) for a detailed explanation), we can use the following **MCL** algorithm: 
 
-![image](https://user-images.githubusercontent.com/17289954/102711084-6a039480-42b7-11eb-8479-3b09618f7317.png)
+![image](https://user-images.githubusercontent.com/17289954/102711316-e8ad0180-42b8-11eb-8734-f4953f18c9e3.png)
+
 
 
 
