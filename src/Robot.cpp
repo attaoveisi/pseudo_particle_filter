@@ -1,5 +1,8 @@
 #include "Robot.h"
 
+Robot::Robot() {}
+Robot::~Robot() {}
+
 Robot::Robot(Map map){
     // Constructor
 
@@ -14,12 +17,18 @@ Robot::Robot(Map map){
 
 void Robot::set(double new_x, double new_y, double new_orient, Map map){
     // Set robot new position and orientation
-    if (new_x < 0 || new_x >= map.world_size)
-    throw std::invalid_argument("X coordinate out of bound");
-    if (new_y < 0 || new_y >= map.world_size)
-    throw std::invalid_argument("Y coordinate out of bound");
-    if (new_orient < 0 || new_orient >= 2 * M_PI)
-    throw std::invalid_argument("Orientation must be in [0..2pi]");
+    if (new_x < 0 || new_x >= map.world_size){
+        throw std::invalid_argument("X coordinate out of bound");
+    }
+
+    if (new_y < 0 || new_y >= map.world_size){
+        throw std::invalid_argument("Y coordinate out of bound");
+    }
+
+    if (new_orient < 0 || new_orient >= 2 * M_PI){
+        throw std::invalid_argument("Orientation must be in [0..2pi]");
+    }
+
 
     x = new_x;
     y = new_y;
@@ -34,10 +43,10 @@ void Robot::set_noise(double new_forward_noise, double new_turn_noise, double ne
 
 vector<double> Robot::sense(Map map){
     // Measure the distances from the robot toward the landmarks
-    vector<double> z(sizeof(map.landmarks) / sizeof(map.landmarks[0]));
+    vector<double> z(map.num_landmarks);
     double dist;
 
-    for (int i = 0; i < sizeof(map.landmarks) / sizeof(map.landmarks[0]); i++) {
+    for (int i = 0; i < map.num_landmarks; i++) {
         dist = sqrt(pow((x - map.landmarks[i][0]), 2) + pow((y - map.landmarks[i][1]), 2));
         dist += gen_gauss_random(0.0, sense_noise);
         z[i] = dist;
@@ -63,24 +72,24 @@ Robot Robot::move(double turn, double forward, Map map){
     y = mod(y, map.world_size);
 
     // set particle
-    Robot res;
-    res.set(x, y, orient);
+    Robot res(map);
+    res.set(x, y, orient, map);
     res.set_noise(forward_noise, turn_noise, sense_noise);
 
     return res;
 }
 
-string Robot::show_pose() {
+std::string Robot::show_pose() {
     // Returns the robot current position and orientation in a string format
-    return "[x=" + to_string(x) + " y=" + to_string(y) + " orient=" + to_string(orient) + "]";
+    return "[x=" + std::to_string(x) + " y=" + std::to_string(y) + " orient=" + std::to_string(orient) + "]";
 }
 
-string Robot::read_sensors(){
+std::string Robot::read_sensors(Map map){
     // Returns all the distances from the robot toward the landmarks
-    vector<double> z = sense();
-    string readings = "[";
+    vector<double> z = sense(map);
+    std::string readings = "[";
     for (int i = 0; i < z.size(); i++) {
-        readings += to_string(z[i]) + " ";
+        readings += std::to_string(z[i]) + " ";
     }
     readings[readings.size() - 1] = ']';
 
@@ -92,7 +101,7 @@ double Robot::measurement_prob(vector<double> measurement, Map map){
     double prob = 1.0;
     double dist;
 
-    for (int i = 0; i < sizeof(map.landmarks) / sizeof(map.landmarks[0]); i++) {
+    for (int i = 0; i < map.num_landmarks; i++) {
         dist = sqrt(pow((x - map.landmarks[i][0]), 2) + pow((y - map.landmarks[i][1]), 2));
         prob *= gaussian(dist, sense_noise, measurement[i]);
     }
@@ -101,9 +110,12 @@ double Robot::measurement_prob(vector<double> measurement, Map map){
 }
 
 double Robot::gen_gauss_random(double mean, double variance){
-// Gaussian random
-normal_distribution<double> gauss_dist(mean, variance);
-return gauss_dist(gen);
+    // Gaussian random
+    std::normal_distribution<double> gauss_dist(mean, variance);
+    // Random Generators
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    return gauss_dist(gen);
 }
 
 double Robot::gaussian(double mu, double sigma, double x){
