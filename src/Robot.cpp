@@ -100,8 +100,8 @@ double Robot::measurement_prob(std::vector<double> measurement){
     double dist;
 
     for (int i = 0; i < num_landmarks; i++) {
-        dist = sqrt(pow((x - landmarks[i][0]), 2) + pow((y - landmarks[i][1]), 2));
-        prob *= gaussian(dist, sense_noise, measurement[i]);
+        dist = sqrt(pow((this->x - landmarks[i][0]), 2) + pow((this->y - landmarks[i][1]), 2));
+        prob *= gaussian(dist, this->sense_noise, measurement[i]);
     }
 
     return prob;
@@ -119,20 +119,6 @@ double Robot::gen_gauss_random(double mean, double variance){
 double Robot::gaussian(double mu, double sigma, double x){
 // Probability of x for 1-dim Gaussian with mean mu and var. sigma
 return exp(-(pow((mu - x), 2)) / (pow(sigma, 2)) / 2.0) / sqrt(2.0 * M_PI * (pow(sigma, 2)));
-}
-
-double Robot::evaluation(Robot r, std::vector<Robot> p, int n)
-{
-    //Calculate the mean error of the system
-    double sum = 0.0;
-    for (int i = 0; i < n; i++) {
-        //the second part is because of world's cyclicity
-        double dx = mod((p[i].x - r.x + (world_size / 2.0)), world_size) - (world_size / 2.0);
-        double dy = mod((p[i].y - r.y + (world_size / 2.0)), world_size) - (world_size / 2.0);
-        double err = sqrt(pow(dx, 2) + pow(dy, 2));
-        sum += err;
-    }
-    return sum / n;
 }
 
 void Robot::get_world_size(Map &map){

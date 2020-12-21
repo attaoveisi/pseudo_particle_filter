@@ -71,10 +71,11 @@ int main()
     myrobot.print_robot();
 
     // Measurement vector
-    std::vector<double> z;
+    std::vector<double> z(num_landmarks);
+    std::vector<double> pz(num_landmarks);
 
     //Iterating 50 times over the set of particles
-    int steps = 100;
+    int steps = 50;
     // Create a set of particles
     int n = 1000;
     std::vector<Robot> p(n);
@@ -96,7 +97,7 @@ int main()
         //std::cout << z[0] << "\t" << z[1] << "\t" << z[2] << "\t" << z[3] << "\t" << z[4] << "\t" << z[5] << "\t" << z[6] << "\t" << z[7] << std::endl;
         // Simulate a robot motion for each of these particles
         for (int i = 0; i < n; i++) {
-            p[i].move(0.1, 5.0);
+            p[i].move(0.1, 2.0);
             p2[i] = p[i];
             //std::cout << p[i].show_pose() << std::endl;
         }
@@ -106,7 +107,8 @@ int main()
         //Generate particle weights depending on robot's measurement
         std::vector<double> w(n);
         for (int i = 0; i < n; i++) {
-            w[i] = p[i].measurement_prob(z);
+            pz = p[i].sense();
+            w[i] = p[i].measurement_prob(pz);
             //cout << w[i] << endl;
         }
 
@@ -134,7 +136,16 @@ int main()
 
         //Evaluate the error by priting it in this form:
         // cout << "Step = " << t << ", Evaluation = " << ErrorValue << endl;
-        std::cout << "Step = " << t << ", Evaluation = " << p3[0].evaluation(myrobot, p, n) << std::endl;
+        double sum = 0.0;
+        for (int i = 0; i < n; i++) {
+            //the second part is because of world's cyclicity
+            double dx = base.mod((p[i].x - myrobot.x + (map_size / 2.0)), map_size) - (map_size / 2.0);
+            double dy = base.mod((p[i].y - myrobot.y + (map_size / 2.0)), map_size) - (map_size / 2.0);
+            double err = sqrt(pow(dx, 2) + pow(dy, 2));
+            sum += err;
+        }
+        sum = sum / n;
+        std::cout << "Step = " << t << ", Evaluation = " << sum << std::endl;
 
         //Graph the position of the robot and the particles at each step
         //visualization(n, myrobot, t, p2, p3);
