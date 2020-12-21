@@ -13,10 +13,14 @@ double Base::gen_real_random()
 double Base::mod(double first_term, double second_term)
 {
     // Compute the modulus
-    return first_term - (second_term)*floor(first_term / (second_term));
+    if (second_term < 0.001){
+        return first_term;
+    } else{
+        return first_term - (second_term)*floor(first_term / (second_term));
+    }
 }
 
-double Base::max(double arr[], int n)
+double Base::max(std::vector<double> arr, int n)
 {
     // Identify the max element in an array
     double max = 0;

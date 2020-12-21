@@ -1,15 +1,16 @@
 #include "Base.h"
 #include "Robot.h"
 #include "Map.h"
+//#include "include/matplotlibcpp.h" //Graph Library
 //namespace plt = matplotlibcpp;
 
 /*
-void visualization(int n, Robot robot, int step, Robot p[], Robot pr[])
+void visualization(int n, Robot robot, int step, std::vector<Robot> p, std::vector<Robot> pr)
 {
 	//Draw the robot, landmarks, particles and resampled particles on a graph
 	
     //Graph Format
-    plt::title("MCL, step " + to_string(step));
+    plt::title("MCL, step " + std::to_string(step));
     plt::xlim(0, 100);
     plt::ylim(0, 100);
 
@@ -24,19 +25,18 @@ void visualization(int n, Robot robot, int step, Robot p[], Robot pr[])
     }
 
     //Draw landmarks in red
-    for (int i = 0; i < sizeof(landmarks) / sizeof(landmarks[0]); i++) {
-        plt::plot({ landmarks[i][0] }, { landmarks[i][1] }, "ro");
+    for (int i = 0; i < sizeof(robot.landmarks) / sizeof(robot.landmarks[0]); i++) {
+        plt::plot({ robot.landmarks[i][0] }, { robot.landmarks[i][1] }, "ro");
     }
     
     //Draw robot position in blue
     plt::plot({ robot.x }, { robot.y }, "bo");
 
 	//Save the image and close the plot
-    plt::save("./Images/Step" + to_string(step) + ".png");
+    plt::save("./Images/Step" + std::to_string(step) + ".png");
     plt::clf();
 }
-*/
-
+ */
 
 int main()
 {
@@ -44,7 +44,7 @@ int main()
     // Landmarks
     Map map;
     // Map size in meters
-    int map_size = 100;
+    double map_size = 100.0;
     map.get_world_size(map_size);
     int num_landmarks = 8;
     std::vector<std::vector<double>> landmarks { { 20.0, 20.0 },
@@ -69,49 +69,53 @@ int main()
     myrobot.get_landmarks(map);
 
     myrobot.print_robot();
-    myrobot.set_noise(5.0, 0.1, 5.0);
-    myrobot.set(30.0, 50.0, M_PI / 2.0);
 
     // Measurement vector
     std::vector<double> z;
 
     //Iterating 50 times over the set of particles
-    int steps = 50;
+    int steps = 100;
     // Create a set of particles
     int n = 1000;
-    Robot p[n];
+    std::vector<Robot> p(n);
+    std::vector<Robot> p2(n);
+    std::vector<Robot> p3(n);
+
+    //std::cout << p[0].sense_noise << std::endl;
 
     for (int i = 0; i < n; i++) {
         p[i].set_noise(0.05, 0.05, 5.0);
-        //cout << p[i].show_pose() << endl;
+        //std::cout << p[i].show_pose() << std::endl;
     }
 
     for (int t = 0; t < steps; t++) {
 
         //Move the robot and sense the environment afterwards
-        myrobot = myrobot.move(0.1, 5.0);
+        myrobot.move(0.1, 5.0);
         z = myrobot.sense();
-
+        //std::cout << z[0] << "\t" << z[1] << "\t" << z[2] << "\t" << z[3] << "\t" << z[4] << "\t" << z[5] << "\t" << z[6] << "\t" << z[7] << std::endl;
         // Simulate a robot motion for each of these particles
-        Robot p2[n];
         for (int i = 0; i < n; i++) {
-            p2[i] = p[i].move(0.1, 5.0);
-            p[i] = p2[i];
+            p[i].move(0.1, 5.0);
+            p2[i] = p[i];
+            //std::cout << p[i].show_pose() << std::endl;
         }
 
+
+        //std::cout << p[0].show_pose() << std::endl;
         //Generate particle weights depending on robot's measurement
-        double w[n];
+        std::vector<double> w(n);
         for (int i = 0; i < n; i++) {
             w[i] = p[i].measurement_prob(z);
             //cout << w[i] << endl;
         }
 
         //Resample the particles with a sample probability proportional to the importance weight
-        Robot p3[n];
+        std::vector<Robot> p3(n);
         int index = base.gen_real_random() * n;
         //cout << index << endl;
         double beta = 0.0;
-        double mw = p3[0].max(w, n);
+        double mw = base.max(w, n);
         //cout << mw;
         for (int i = 0; i < n; i++) {
             beta += base.gen_real_random() * 2.0 * mw;
@@ -131,6 +135,10 @@ int main()
         //Evaluate the error by priting it in this form:
         // cout << "Step = " << t << ", Evaluation = " << ErrorValue << endl;
         std::cout << "Step = " << t << ", Evaluation = " << p3[0].evaluation(myrobot, p, n) << std::endl;
+
+        //Graph the position of the robot and the particles at each step
+        //visualization(n, myrobot, t, p2, p3);
+
 
     } //End of Steps loop
 

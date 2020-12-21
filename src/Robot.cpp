@@ -52,29 +52,29 @@ std::vector<double> Robot::sense(){
     return z;
 }
 
-Robot Robot::move(double turn, double forward){
-    if (forward < 0)
+void Robot::move(double turn, double forward){
+    if (forward < 0){
         throw std::invalid_argument("Robot cannot move backward");
+    }
 
     // turn, and add randomness to the turning command
-    orient = orient + turn + gen_gauss_random(0.0, turn_noise);
-    orient = mod(orient, 2 * M_PI);
+    this->orient = this->orient + turn + gen_gauss_random(0.0, turn_noise);
+    this->orient = mod(this->orient, 2 * M_PI);
 
     // move, and add randomness to the motion command
     double dist = forward + gen_gauss_random(0.0, forward_noise);
-    x = x + (cos(orient) * dist);
-    y = y + (sin(orient) * dist);
-
+    this->x = this->x + (cos(this->orient) * dist);
+    this->y = this->y + (sin(this->orient) * dist);
+    //std::cout << this->x << std::endl;
     // cyclic truncate
-    x = mod(x, world_size);
-    y = mod(y, world_size);
+    this->x = mod(this->x, world_size);
+    //std::cout << this->x << std::endl;
+    this->y = mod(this->y, world_size);
 
     // set particle
-    Robot res;
-    res.set(x, y, orient);
-    res.set_noise(forward_noise, turn_noise, sense_noise);
-
-    return res;
+    //Robot res;
+    //res.set(x, y, orient);
+    //res.set_noise(forward_noise, turn_noise, sense_noise);
 }
 
 std::string Robot::show_pose() {
@@ -121,7 +121,7 @@ double Robot::gaussian(double mu, double sigma, double x){
 return exp(-(pow((mu - x), 2)) / (pow(sigma, 2)) / 2.0) / sqrt(2.0 * M_PI * (pow(sigma, 2)));
 }
 
-double Robot::evaluation(Robot r, Robot p[], int n)
+double Robot::evaluation(Robot r, std::vector<Robot> p, int n)
 {
     //Calculate the mean error of the system
     double sum = 0.0;

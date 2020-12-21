@@ -14,7 +14,7 @@ public:
     virtual ~Base() = default;
     double mod(double first_term, double second_term);
     double gen_real_random();
-    double max(double arr[], int n);
+    double max(std::vector<double> arr, int n);
 };
 
 #endif //SRC_BASE_H

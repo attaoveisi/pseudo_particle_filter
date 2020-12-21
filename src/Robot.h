@@ -17,7 +17,7 @@ public:
 
     std::vector<double> sense();
 
-    Robot move(double turn, double forward);
+    void move(double turn, double forward);
 
     std::string show_pose();
 
@@ -25,7 +25,7 @@ public:
 
     double measurement_prob(std::vector<double> measurement);
 
-    double evaluation(Robot r, Robot p[], int n);
+    double evaluation(Robot r, std::vector<Robot> p, int n);
 
     void get_world_size(Map &map);
 
