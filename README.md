@@ -53,6 +53,23 @@ The mismatch between the two indicates the particle's importance weight. Next, t
 
 However, the max operator for the weights are not used and a rather random process should be employed.
 
+## An example
+
+The results of localization convergence is shown below for a world of size 100x100 and eight landmarks:
+
+![image](https://user-images.githubusercontent.com/17289954/102865982-d953c280-4436-11eb-92da-8b5ebd169573.png)
+![image](https://user-images.githubusercontent.com/17289954/102868101-0c4b8580-443a-11eb-903a-41f9b5dc7708.png)
+![image](https://user-images.githubusercontent.com/17289954/102868159-208f8280-443a-11eb-8645-c456fe272d42.png)
+![image](https://user-images.githubusercontent.com/17289954/102868215-31d88f00-443a-11eb-9f4b-fd089b31be47.png)
+![image](https://user-images.githubusercontent.com/17289954/102868243-3ac96080-443a-11eb-8b0c-894c600a8b3c.png)
+![image](https://user-images.githubusercontent.com/17289954/102868304-50d72100-443a-11eb-8048-2dc67d0e2391.png)
+![image](https://user-images.githubusercontent.com/17289954/102868333-5af91f80-443a-11eb-8b72-30dd33a14b6d.png)
+![image](https://user-images.githubusercontent.com/17289954/102868402-6fd5b300-443a-11eb-9b03-6b3840b20dd8.png)
+![image](https://user-images.githubusercontent.com/17289954/102868457-80862900-443a-11eb-8e8e-fad1e66e7a37.png)
+![image](https://user-images.githubusercontent.com/17289954/102868539-985dad00-443a-11eb-9680-60dfbd11ba20.png)
+![image](https://user-images.githubusercontent.com/17289954/102868596-a7dcf600-443a-11eb-82dc-a0aeff0915a8.png)
+![image](https://user-images.githubusercontent.com/17289954/102868692-c642f180-443a-11eb-8976-5942ba2f7592.png)
+![image](https://user-images.githubusercontent.com/17289954/102868722-d35fe080-443a-11eb-9dda-f1e582bc0fc6.png)
 
 
 
