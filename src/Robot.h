@@ -11,6 +11,8 @@ public:
 
     ~Robot() override;
 
+    void randomized_position(Map map);
+
     void set(double new_x, double new_y, double new_orient);
 
     void set_noise(double new_forward_noise, double new_turn_noise, double new_sense_noise);
@@ -29,8 +31,8 @@ public:
 
     void get_landmarks(Map &map);
 
-    double x{}, y{}, orient{}; //robot poses
-    double forward_noise{}, turn_noise{}, sense_noise{}; //robot noises
+    double x, y, orient; //robot poses
+    double forward_noise, turn_noise, sense_noise; //robot noises
 
     double world_size;
 

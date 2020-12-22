@@ -4,13 +4,16 @@ Robot::~Robot() {}
 
 Robot::Robot(){
     // Constructor
-    x = gen_real_random() * world_size; // robot's x coordinate
-    y = gen_real_random() * world_size; // robot's y coordinate
-    orient = gen_real_random() * 2.0 * M_PI; // robot's orientation
-
     forward_noise = 0.0; //noise of the forward movement
     turn_noise = 0.0; //noise of the turn
     sense_noise = 0.0; //noise of the sensing
+}
+
+void Robot::randomized_position(Map map) {
+    this->x = gen_real_random() * map.world_size; // robot's x coordinate
+    std::cout << gen_real_random() * world_size << std::endl;
+    this->y = gen_real_random() * map.world_size; // robot's y coordinate
+    this->orient = gen_real_random() * 2.0 * M_PI; // robot's orientation
 }
 
 void Robot::set(double new_x, double new_y, double new_orient){

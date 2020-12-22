@@ -1,42 +1,47 @@
 #include "Base.h"
 #include "Robot.h"
 #include "Map.h"
-//#include "include/matplotlibcpp.h" //Graph Library
-//namespace plt = matplotlibcpp;
+#include <matplot/matplot.h>
 
-/*
-void visualization(int n, Robot robot, int step, std::vector<Robot> p, std::vector<Robot> pr)
+void visualization(int n, Robot robot, int step, std::vector<Robot> p, std::vector<Robot> pr, int num_landmarks)
 {
 	//Draw the robot, landmarks, particles and resampled particles on a graph
-	
+    matplot::figure(1);
     //Graph Format
-    plt::title("MCL, step " + std::to_string(step));
-    plt::xlim(0, 100);
-    plt::ylim(0, 100);
+    matplot::title("MCL, step " + std::to_string(step));
+    matplot::xlim({0.0, 100.0});
+    matplot::ylim({0.0, 100.0});
 
     //Draw particles in green
+
     for (int i = 0; i < n; i++) {
-        plt::plot({ p[i].x }, { p[i].y }, "go");
+        matplot::hold(matplot::on);
+        matplot::plot({ p[i].x }, { p[i].y }, "go");
     }
+    matplot::hold(matplot::on);
 
     //Draw resampled particles in yellow
     for (int i = 0; i < n; i++) {
-        plt::plot({ pr[i].x }, { pr[i].y }, "yo");
+        matplot::hold(matplot::on);
+        matplot::plot({ pr[i].x }, { pr[i].y }, "yo");
+    }
+    matplot::hold(matplot::on);
+    //Draw landmarks in red
+    for (int i = 0; i < num_landmarks; i++) {
+        matplot::hold(matplot::on);
+        matplot::plot({ robot.landmarks[i][0] }, { robot.landmarks[i][1] }, "ro");
     }
 
-    //Draw landmarks in red
-    for (int i = 0; i < sizeof(robot.landmarks) / sizeof(robot.landmarks[0]); i++) {
-        plt::plot({ robot.landmarks[i][0] }, { robot.landmarks[i][1] }, "ro");
-    }
-    
     //Draw robot position in blue
-    plt::plot({ robot.x }, { robot.y }, "bo");
+    matplot::hold(matplot::on);
+    matplot::plot({ robot.x }, { robot.y }, "bo");
 
 	//Save the image and close the plot
-    plt::save("./Images/Step" + std::to_string(step) + ".png");
-    plt::clf();
+    matplot::show();
+    std::string fig_name = "./Images/Step" + std::to_string(step) + ".jpg";
+    std::cout << fig_name << " is saved." <<std::endl;
+    matplot::save(fig_name);
 }
- */
 
 int main()
 {
@@ -64,10 +69,11 @@ int main()
     map.print_map();
 
     //Initialize myrobot object and Initialize a measurment vector
-    Robot myrobot = Robot();
+    Robot myrobot;
     myrobot.get_world_size(map);
     myrobot.get_landmarks(map);
-
+    myrobot.randomized_position(map);
+    //myrobot.set(30.0, 50.0, M_PI / 2.0);
     myrobot.print_robot();
 
     // Measurement vector
@@ -79,12 +85,18 @@ int main()
     // Create a set of particles
     int n = 1000;
     std::vector<Robot> p(n);
-    std::vector<Robot> p2(n);
+    std::vector<Robot> p_temp(n);
     std::vector<Robot> p3(n);
 
     //std::cout << p[0].sense_noise << std::endl;
 
     for (int i = 0; i < n; i++) {
+        p[i].get_world_size(map);
+        p[i].get_landmarks(map);
+        p[i].randomized_position(map);
+        p3[i].get_world_size(map);
+        p3[i].get_landmarks(map);
+        p3[i].randomized_position(map);
         p[i].set_noise(0.05, 0.05, 5.0);
         //std::cout << p[i].show_pose() << std::endl;
     }
@@ -97,8 +109,9 @@ int main()
         //std::cout << z[0] << "\t" << z[1] << "\t" << z[2] << "\t" << z[3] << "\t" << z[4] << "\t" << z[5] << "\t" << z[6] << "\t" << z[7] << std::endl;
         // Simulate a robot motion for each of these particles
         for (int i = 0; i < n; i++) {
-            p[i].move(0.1, 2.0);
-            p2[i] = p[i];
+            p_temp[i] = p[i];
+            p_temp[i].move(0.1, 5.0);
+            p[i] = p_temp[i];
             //std::cout << p[i].show_pose() << std::endl;
         }
 
@@ -108,12 +121,11 @@ int main()
         std::vector<double> w(n);
         for (int i = 0; i < n; i++) {
             pz = p[i].sense();
-            w[i] = p[i].measurement_prob(pz);
+            w[i] = p[i].measurement_prob(z);
             //cout << w[i] << endl;
         }
 
         //Resample the particles with a sample probability proportional to the importance weight
-        std::vector<Robot> p3(n);
         int index = base.gen_real_random() * n;
         //cout << index << endl;
         double beta = 0.0;
@@ -148,7 +160,7 @@ int main()
         std::cout << "Step = " << t << ", Evaluation = " << sum << std::endl;
 
         //Graph the position of the robot and the particles at each step
-        //visualization(n, myrobot, t, p2, p3);
+        visualization(n, myrobot, t, p_temp, p3, num_landmarks);
 
 
     } //End of Steps loop
